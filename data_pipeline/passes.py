@@ -4,14 +4,13 @@ import json
 import logging
 from collections import defaultdict
 from typing import List, Dict, Any
-
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from neo4j import GraphDatabase
 from db.neo4j_db import get_neo4j_driver
-from pipeline.loader import CACHE_DIR
+from data_pipeline.loader import CACHE_DIR
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")

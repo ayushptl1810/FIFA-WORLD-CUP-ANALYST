@@ -26,10 +26,10 @@ def init_qdrant_schema():
         client.delete_collection(collection_name=collection_name)
         existing.remove(collection_name)
 
-    print(f"\n[1] Creating collection: {collection_name} with vector size = 15...")
+    print(f"\n[1] Creating collection: {collection_name} with vector size = 21...")
     client.create_collection(
         collection_name=collection_name,
-        vectors_config=VectorParams(size=15, distance=Distance.COSINE),
+        vectors_config=VectorParams(size=21, distance=Distance.COSINE),
     )
     print(f"    ✅ Collection created: {collection_name}")
 
