@@ -6,3 +6,4 @@ __pycache__
 pyrightconfig.json
 .vscode
 data/
+rl_agent/tactiq_policy.zip
