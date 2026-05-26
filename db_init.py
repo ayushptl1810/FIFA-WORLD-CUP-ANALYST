@@ -11,7 +11,7 @@ def run_master_init():
     print("                TACTIQ - MASTER DATABASE INITIALIZATION SYSTEM                ")
     print("="*80)
     print("Starting sequential database initialization...\n")
-    
+
     status = {
         "Redis Streams": False,
         "Neo4j Schema": False,
@@ -53,10 +53,10 @@ def run_master_init():
 
     print("─"*80)
     if all_success:
-        print("🎉 Congratulations! All databases have been successfully initialized and are ready!")
+        print("Congratulations! All databases have been successfully initialized and are ready!")
     else:
-        print("⚠️ Some database initializations failed. Please inspect the logs above, check your")
-        print("   Docker containers ('docker compose ps'), and run 'python db_init.py' again.")
+        print("Some database initializations failed. Please inspect the logs above, check your")
+        print("Docker containers ('docker compose ps'), and run 'python db_init.py' again.")
     print("="*80 + "\n")
 
 if __name__ == "__main__":
