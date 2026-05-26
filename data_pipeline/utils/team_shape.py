@@ -18,12 +18,13 @@ def get_attack_width(window: List[Dict[str, Any]], home_team: str) -> float:
 
 
 def get_max_player_drift(window: List[Dict[str, Any]], home_team: str) -> float:
-    from collections import defaultdict
     player_locs = defaultdict(list)
     for e in window:
         if e.get('type', {}).get('name') == 'Carry' and e.get('team', {}).get('name') == home_team:
+            
             pid = e.get('player', {}).get('id')
             loc = e.get('location', [])
+
             if pid and loc:
                 player_locs[pid].append(loc[0])
 
@@ -34,6 +35,7 @@ def get_max_player_drift(window: List[Dict[str, Any]], home_team: str) -> float:
 def get_candidate_drift(window: List[Dict[str, Any]], candidate_player_id: Optional[int]) -> float:
     if not candidate_player_id:
         return 0.0
+        
     cand_carries = [
         e.get('location', [])[0] for e in window 
         if e.get('type', {}).get('name') == 'Carry' 

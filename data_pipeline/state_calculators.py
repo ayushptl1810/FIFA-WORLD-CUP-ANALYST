@@ -13,36 +13,22 @@ from data_pipeline.loader import CACHE_DIR
 
 # Import modular features sub-calculators from pipeline utilities
 from data_pipeline.utils.match_context import (
-    get_score_diff,
-    get_subs_used,
-    get_xg_diff,
-    get_possession_pct,
-    get_formation_vec,
-    get_red_card_factor,
-    get_yellow_card_count,
-    get_outcome_15m
+    get_score_diff, get_subs_used, get_xg_diff, get_possession_pct,
+    get_formation_vec, get_red_card_factor, get_yellow_card_count, get_outcome_15m
 )
 
 from data_pipeline.utils.team_shape import (
-    get_team_compactness,
-    get_def_line_height,
-    get_attack_width,
-    get_max_player_drift,
-    get_candidate_drift
+    get_team_compactness, get_def_line_height, get_attack_width,
+    get_max_player_drift, get_candidate_drift
 )
 
 from data_pipeline.utils.match_intensity import (
-    get_press_intensity,
-    get_momentum_15m,
-    get_box_entries
+    get_press_intensity, get_momentum_15m, get_box_entries
 )
 
 from data_pipeline.utils.substitution_proxies import (
-    get_voronoi_area_change,
-    get_zone_overload_score,
-    get_centrality_delta,
-    get_candidate_involvement,
-    get_candidate_hist_impact
+    get_voronoi_area_change, get_zone_overload_score, get_centrality_delta,
+    get_candidate_involvement, get_candidate_hist_impact
 )
 
 logger = logging.getLogger(__name__)
