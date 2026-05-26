@@ -15,17 +15,6 @@ def check(name, fn):
 
 print("\nTactIQ — Stage 1 Docker Connection Check\n" + "─"*40)
 
-# # API-Football
-# def test_apifootball():
-#     import requests
-#     r = requests.get(
-#         "https://api-football-v1.p.rapidapi.com/v3/status",
-#         headers={"X-RapidAPI-Key": os.getenv("RAPIDAPI_KEY"),
-#                  "X-RapidAPI-Host": os.getenv("RAPIDAPI_HOST")}
-#     )
-#     assert r.status_code == 200
-# check("API-Football (status endpoint)", test_apifootball)
-
 # Redis
 def test_redis():
     redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")

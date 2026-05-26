@@ -1,13 +1,3 @@
-"""
-Interactive Demonstrations for `soccerdata` and `datafc` Libraries
-==================================================================
-
-This file provides clean, runnable examples showcasing exactly how to use:
-1. `datafc` - A modern, fast, pandas-oriented Sofascore API wrapper (perfect for World Cup analysis!).
-2. `soccerdata` - A unified scraping interface for ClubElo, Understat, FBref, and more.
-"""
-
-import os
 import pandas as pd
 import soccerdata as sd
 import datafc
