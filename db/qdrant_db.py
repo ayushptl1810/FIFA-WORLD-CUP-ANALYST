@@ -21,15 +21,17 @@ def init_qdrant_schema():
     existing = [c.name for c in client.get_collections().collections]
 
     collection_name = "historical_states"
-    if collection_name not in existing:
-        print(f"\n[1] Creating collection: {collection_name}...")
-        client.create_collection(
-            collection_name=collection_name,
-            vectors_config=VectorParams(size=12, distance=Distance.COSINE),
-        )
-        print(f"    ✅ Collection created: {collection_name}")
-    else:
-        print(f"\n[1] Collection already exists: {collection_name} (skipping creation)")
+    if collection_name in existing:
+        print(f"\n[1] Dropping existing collection to resize: {collection_name}...")
+        client.delete_collection(collection_name=collection_name)
+        existing.remove(collection_name)
+
+    print(f"\n[1] Creating collection: {collection_name} with vector size = 15...")
+    client.create_collection(
+        collection_name=collection_name,
+        vectors_config=VectorParams(size=15, distance=Distance.COSINE),
+    )
+    print(f"    ✅ Collection created: {collection_name}")
 
     # 3. Verify collection parameters robustly (handling object vs dict representation)
     print("\n" + "─"*40)
