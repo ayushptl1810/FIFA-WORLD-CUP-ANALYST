@@ -187,6 +187,15 @@ def compute_match_rewards(match_id: int, home_team: str, events: List[Dict[str, 
                 subs_used = vec[2] # subs_used
                 if momentum < -0.3 and subs_used < 3.0:
                     reward -= 0.3
+            
+            # 3. Critical Fatigue Inaction Penalty (Antigravity Extension)
+            fatigue_state = vec[23] # fatigue_state
+            if fatigue_state >= 0.8:
+                reward -= 0.6
+            elif 0.5 <= fatigue_state < 0.8:
+                momentum = vec[9] # momentum_15m
+                if momentum < -0.2:
+                    reward -= 0.3
         
         # Round reward for storage neatness
         reward = round(reward, 4)

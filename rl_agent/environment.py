@@ -77,7 +77,7 @@ class TactiqEnv(gym.Env):
         self.observation_space = spaces.Box(
             low=-np.inf, 
             high=np.inf, 
-            shape=(21,), 
+            shape=(24,), 
             dtype=np.float32
         )
         
@@ -90,7 +90,7 @@ class TactiqEnv(gym.Env):
         
     def normalize_obs(self, vector: List[float]) -> np.ndarray:
         """
-        Normalizes a raw 21D state vector using the dataset-wide mean and standard deviation.
+        Normalizes a raw 24D state vector using the dataset-wide mean and standard deviation.
         """
         return (np.array(vector, dtype=np.float32) - self.obs_mean) / self.obs_std
         
@@ -105,6 +105,13 @@ class TactiqEnv(gym.Env):
         
         if subs_used >= 3.0:
             return np.array([True, False, False, False], dtype=np.bool_)
+            
+        # Dynamic Action Masking for Critical Players (Antigravity Extension)
+        # Vector index 23 corresponds to the continuous fatigue_state
+        fatigue_state = state['vector'][23]
+        if fatigue_state >= 0.8:
+            # Force substitution (Wait is illegal)
+            return np.array([False, True, True, True], dtype=np.bool_)
             
         return np.array([True, True, True, True], dtype=np.bool_)
 
@@ -175,7 +182,7 @@ class TactiqEnv(gym.Env):
         
         if terminated:
             # Episode ended, return zero observation
-            obs = np.zeros((21,), dtype=np.float32)
+            obs = np.zeros((24,), dtype=np.float32)
             info = {
                 "match_id": self.current_match_id,
                 "minute": 90,

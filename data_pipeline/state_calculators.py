@@ -31,6 +31,10 @@ from data_pipeline.utils.substitution_proxies import (
     get_candidate_involvement, get_candidate_hist_impact
 )
 
+from data_pipeline.utils.fatigue import (
+    get_involvement_slope, get_pressing_load, get_fatigue_state
+)
+
 logger = logging.getLogger(__name__)
 MINUTES = list(range(5, 91, 5))   # [5, 10, 15, ..., 90]
 
@@ -38,7 +42,8 @@ MINUTES = list(range(5, 91, 5))   # [5, 10, 15, ..., 90]
 FEATURE_SCHEMA = [
     "score_diff", "minute_norm", "subs_used", "xg_diff", "possession_pct", "press_intensity", "team_compactness", "def_line_height",
     "attack_width", "momentum_15m", "formation_vec", "max_player_drift", "red_card_factor", "yellow_card_count", "box_entries",
-    "voronoi_area_change", "zone_overload_score", "centrality_delta", "candidate_involvement", "candidate_drift", "candidate_hist_impact"
+    "voronoi_area_change", "zone_overload_score", "centrality_delta", "candidate_involvement", "candidate_drift", "candidate_hist_impact",
+    "involvement_slope_15m", "pressing_load_factor", "fatigue_state"
 ]
 
 # Global cache dictionary for Feature 21 (pre-computed once upfront)
@@ -174,6 +179,8 @@ def compute_states(match_id: int, match_meta: dict, events: List[Dict[str, Any]]
             pass
 
     snapshots = []
+    # Track candidate involvement history sequentially per player
+    involvement_history = defaultdict(list)
 
     for cutoff in MINUTES:
         # Sliced play-by-play events up to this minute
@@ -195,14 +202,32 @@ def compute_states(match_id: int, match_meta: dict, events: List[Dict[str, Any]]
                 completed_sub = s
                 break
 
+        # Pre-compute contextual values needed for dynamic fatigue calculations
+        recent_involvement = get_candidate_involvement(candidate_player_id, by_minute, cutoff, home_team)
+        drift = get_candidate_drift(window, candidate_player_id)
+        press_intensity = get_press_intensity(window, home_team, away_team)
+        possession_pct = get_possession_pct(window, home_team)
+
+        if candidate_player_id is not None:
+            # Append current involvement to sequential match history first
+            involvement_history[candidate_player_id].append(recent_involvement)
+            
+            involvement_slope_15m = get_involvement_slope(candidate_player_id, involvement_history, recent_involvement)
+            pressing_load_factor = get_pressing_load(press_intensity, possession_pct, cutoff)
+            fatigue_state = get_fatigue_state(candidate_player_id, cutoff, recent_involvement, involvement_history, drift, pressing_load_factor)
+        else:
+            involvement_slope_15m = 0.0
+            pressing_load_factor = 0.0
+            fatigue_state = 0.0
+
         # Calculate values dynamically using focused sub-calculators from pipeline utilities
         features = {
             "score_diff":            get_score_diff(window, home_team, away_team),
             "minute_norm":           round(cutoff / 90.0, 4),
             "subs_used":             get_subs_used(window, home_team),
             "xg_diff":               get_xg_diff(window, home_team, away_team),
-            "possession_pct":        get_possession_pct(window, home_team),
-            "press_intensity":       get_press_intensity(window, home_team, away_team),
+            "possession_pct":        possession_pct,
+            "press_intensity":       press_intensity,
             "team_compactness":      get_team_compactness(window, home_team),
             "def_line_height":       get_def_line_height(window, home_team),
             "attack_width":          get_attack_width(window, home_team),
@@ -215,9 +240,12 @@ def compute_states(match_id: int, match_meta: dict, events: List[Dict[str, Any]]
             "voronoi_area_change":   get_voronoi_area_change(completed_sub, events, event_uuid_space),
             "zone_overload_score":   get_zone_overload_score(completed_sub, by_minute, home_team, away_team),
             "centrality_delta":      get_centrality_delta(completed_sub, by_minute, home_team),
-            "candidate_involvement": get_candidate_involvement(candidate_player_id, by_minute, cutoff, home_team),
-            "candidate_drift":       get_candidate_drift(window, candidate_player_id),
-            "candidate_hist_impact": get_candidate_hist_impact(future_replacement_id, PLAYER_HIST_IMPACT)
+            "candidate_involvement": recent_involvement,
+            "candidate_drift":       drift,
+            "candidate_hist_impact": get_candidate_hist_impact(future_replacement_id, PLAYER_HIST_IMPACT),
+            "involvement_slope_15m": involvement_slope_15m,
+            "pressing_load_factor": pressing_load_factor,
+            "fatigue_state":         fatigue_state
         }
 
         # Dynamically map floats according to FEATURE_SCHEMA index ordering

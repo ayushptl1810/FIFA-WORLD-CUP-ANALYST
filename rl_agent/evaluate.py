@@ -20,27 +20,28 @@ def evaluate_gated_policy():
     env.reset(seed=42)
     model = PPO.load("rl_agent/tactiq_policy.zip", env=env)
     
-    logger.info("Evaluating Gated PPO Policy over 50 matches (seeded)...")
+    num_matches = len(env.match_ids)
+    logger.info(f"Evaluating Gated PPO Policy over all {num_matches} matches (seeded)...")
     
     # 2. Run deterministic evaluation
     mean_reward, std_reward = evaluate_policy(
         model, 
         env, 
-        n_eval_episodes=50, 
+        n_eval_episodes=num_matches, 
         deterministic=True,
         warn=False
     )
     
-    # Calculate Human Coach baseline return over the first 50 matches
+    # Calculate Human Coach baseline return over all matches
     coach_returns = []
-    for match_id in env.match_ids[:50]:
+    for match_id in env.match_ids:
         trajectory = env.match_trajectories[match_id]
         coach_return = sum(state['payload'].get('reward', 0.0) for state in trajectory)
         coach_returns.append(coach_return)
     mean_coach = np.mean(coach_returns)
     
     print("\n" + "=" * 60)
-    print("🏆 FINAL EVALUATION RESULTS (50 MATCHES)")
+    print(f"🏆 FINAL EVALUATION RESULTS (ALL {num_matches} MATCHES)")
     print("=" * 60)
     print(f"  🤖 Gated PPO Policy Mean Match Reward:  {mean_reward:+.4f} (± {std_reward:.4f})")
     print(f"  👥 Human Coach Baseline Mean Reward:      {mean_coach:+.4f}")

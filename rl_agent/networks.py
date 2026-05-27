@@ -5,16 +5,16 @@ from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 class GatedTacticalExtractor(BaseFeaturesExtractor):
     """
     Custom PyTorch Feature Extractor for PPO implementing a Learned Gating Mask
-    (Gated Feature Attention) over our 21D tactical state vector.
+    (Gated Feature Attention) over our 24D tactical state vector.
     
     This layer dynamically scales, masks, or highlights features—such as zeroing out
     missing StatsBomb 360 data or amplifying fatigue signals late in the match.
     """
     def __init__(self, observation_space, features_dim: int = 64):
         super().__init__(observation_space, features_dim)
-        input_dim = observation_space.shape[0]  # Expected to be 21
+        input_dim = observation_space.shape[0]  # Expected to be 24
         
-        # Gating network: maps input vector to a coefficient vector g in [0, 1]^21
+        # Gating network: maps input vector to a coefficient vector g in [0, 1]^24
         self.gate_net = nn.Sequential(
             nn.Linear(input_dim, input_dim),
             nn.Sigmoid()

@@ -56,7 +56,7 @@ def pretrain_behavior_cloning(env: TactiqEnv, epochs: int = 15, batch_size: int 
     """
     Supervised Behavior Cloning (BC) Pre-training Phase.
     Directly trains a PyTorch classification network to predict the empirical coach actions (0-3)
-    from the 21D state vector. This initializes our PPO Actor to follow realistic human coaching.
+    from the 24D state vector. This initializes our PPO Actor to follow realistic human coaching.
     """
     logger.info("--- Starting Behavior Cloning Pre-Training Phase ---")
     
